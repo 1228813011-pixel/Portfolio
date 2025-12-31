@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <script>
+    (function () {
+      try {
+        var root = document.documentElement;
+
+        var THEME_KEY = "etcpfolio.theme";
+        var saved = localStorage.getItem(THEME_KEY);
+        var prefersLight = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches;
+        root.setAttribute("data-theme", saved || (prefersLight ? "light" : "dark"));
+
+        if (localStorage.getItem("jrui.splashNever") === "1") {
+          root.classList.add("splash-skip");
+        }
+      } catch (e) {}
+    })();
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Generative NPC</title>
+  <meta name="description" content="Case study: demo + your role + technical breakdown + iteration + outcomes." />
+  <meta name="color-scheme" content="dark light">
+  <link rel="stylesheet" href="../assets/style.css" />
+</head>
+
+<body>
+  <header class="nav">
+    <div class="container navInner row between">
+      <a class="brand" href="../index.html">
+        <span class="dot" aria-hidden="true"></span>
+        <span>Jirui Zhang</span>
+      </a>
+      
+      
+      <nav class="navLinks" aria-label="Primary">
+        <a href="../index.html#projects">Home</a>
+        <a href="#cta">Documents</a>
+        <a href="unity/VampireSurvivorsClone-main.zip" download>Download</a>
+        <a href="#contact">Contact</a>
+        <button id="themeToggle" class="iconBtn" type="button" aria-label="Toggle theme">
+          <span id="themeIcon" aria-hidden="true">🌙</span>
+          <span id="themeLabel">Dark</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="heroMini">
+      <div class="container">
+        <div class="breadcrumbs reveal">
+          <a href="../index.html#projects">Projects</a> <span aria-hidden="true">/</span> <span> Generative NPC Pipeline</span>
+        </div>
+        <h1 class="reveal" style="font-size: clamp(34px, 5vw, 52px); margin-top: 10px;">
+          Generative NPC pipeline: Generative AI for In-game Dynamic NPC  <span class="grad">Creation and Adaptation</span>
+        </h1>
+
+        <p class="sub reveal" style="max-width: 80ch;">
+          An interactive pipeline where language-guided tuning updates monster attributes and appearance, and the modified blueprint is deployed directly into the game.
+      </div>
+    </section>
+
+    <section class="section" style="padding-top: 10px;">
+      <div class="container caseGrid">
+        <div class="caseMedia reveal">
+          <div class="frame">
+            <video class="frameMedia"
+                  src="unity/unity.mp4"
+                  controls
+                  playsinline
+                  preload="metadata"
+                  poster="unity/ai.png">
+            </video>
+          </div>
+        </div>
+
+        <aside class="caseAside reveal">
+          <div class="panel">
+            <h2 style="margin:0 0 10px;">TL;DR</h2>
+
+            <div class="kv">
+              <div class="kvItem">
+                <div class="k">Role</div>
+                <div class="v">Solo Researcher / Developer</div>
+              </div>
+
+              <div class="kvItem">
+                <div class="k">Stack</div>
+                <div class="v">Unity (C#) • Local LLM (Qwen3-VL via Ollama)</div>
+              </div>
+
+              <div class="kvItem">
+                <div class="k">Time & Context</div>
+                <div class="v">BSc Dissertation: 10/2025 - now </div>
+              </div>
+
+              <div class="kvItem">
+                <div class="k">Outcome</div>
+                <div class="v">Playable prototype + “Monster AI generator” </div>
+            </div>
+
+            <div class="pills" style="margin-top:12px">
+              <span class="pill">Unity</span>
+              <span class="pill">LLM</span>
+              <span class="pill">In progress</span>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="panel caseBody reveal">
+          <h2>My Contributions</h2>
+          <ul>
+            <li><strong>End-to-end text→NPC pipeline:</strong> Designed and implemented a natural-language workflow that generates a structured NPC specification and applies it directly in-game (prompt → JSON → validated spec → runtime update).</li>
+
+            <li><strong>Schema-constrained prompting:</strong> Defined a strict JSON schema for monster attributes/appearance and used constrained prompting to reduce hallucinations and keep outputs parseable.</li>
+
+            <li><strong>Unity integration & runtime binding:</strong> Built the Unity-side “Monster Blueprint” binding layer (ScriptableObject + runtime application) to safely update stats, visuals, and behaviour parameters without breaking gameplay.</li>
+
+            <li><strong>Local LLM deployment:</strong> Integrated a locally hosted Qwen3-VL model via Ollama, using async requests to avoid blocking the main thread and keep the prototype responsive.</li>
+
+            <li><strong>Tooling & safety checks:</strong> Implemented an in-editor/ingame tuning UI, plus validation/fallback rules (type checks, clamping ranges, default values) to prevent invalid configurations from crashing the build.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    
+    <section class="section">
+  <div class="container">
+    <div class="panel caseBody reveal">
+      <h2>Technical Breakdown</h2>
+
+      <ul>
+        <!-- 1) Architecture -->
+        <li>
+          <strong>Architecture:</strong>
+          Text-to-NPC system structured as a pipeline around a validated NPC specification:
+          player input + blueprint context → LLM JSON generation → schema validation → blueprint binding → prefab injection.
+          The design keeps game logic decoupled from generation logic so the same pipeline can swap different LLM backends.
+
+          <div class="ctrlGrid">
+            <figure class="ctrlItem">
+              <img src="unity/SalesOrderSystem.jpg" alt="System context diagram" loading="lazy">
+              <figcaption><strong>System Context Diagram.</strong> High-level architecture of the text-to-NPC system.</figcaption>
+            </figure>
+
+            <figure class="ctrlItem">
+              <img src="unity/Data flow Diagram.png" alt="Data flow diagram" loading="lazy">
+              <figcaption><strong>Data Flow Diagram.</strong> End-to-end flow from input to runtime injection.</figcaption>
+            </figure>
+          </div>
+
+        </li>
+
+        <!-- 2) System Workflow -->
+        <li>
+          <strong>Workflow (Runtime Pipeline):</strong>
+          At runtime, the system maps a natural-language description <em>d</em> and a selected blueprint <em>b</em> into
+          an engine-ready NPC by executing six stages:
+
+          <ul class="subList">
+            <li><strong>Stage 1 — Player Input:</strong> select a MonsterBlueprint + enter a tuning instruction.</li>
+            <li><strong>Stage 2 — Prompt Constructor:</strong> build a schema-aligned prompt (editable fields only, JSON-only output).</li>
+            <li><strong>Stage 3 — LLM JSON Generation:</strong> local LLM returns structured JSON for attributes/visual slots.</li>
+            <li><strong>Stage 4 — Validation & Parsing:</strong> syntax + schema + type checks, with graceful fallback on error.</li>
+            <li><strong>Stage 5 — Attribute Binding:</strong> bind validated fields into the MonsterBlueprint / runtime controller.</li>
+            <li><strong>Stage 6 — Engine Update:</strong> commit assets and inject/spawn the updated NPC into the active scene.</li>
+          </ul>
+
+          <figure class="archFigure">
+            <img
+              src="unity/pipeline.png"
+              alt="Pipeline diagram: description to NPC specification to prefab assembly and runtime injection"
+              loading="lazy"
+            />
+            <figcaption><strong>Pipeline diagram.</strong> Six stages from natural-language input to an engine-ready NPC.</figcaption>
+          </figure>
+        </li>
+
+        <!-- 3) Functional behaviour + Requirements -->
+        <li>
+          <strong>Functional Behaviour & Requirements:</strong>
+          Primary use case: generate an NPC from natural-language input and inject it into the running prototype.
+
+          <figure class="archFigure">
+            <img
+              src="unity/Use_Case_Diagram.png"
+              alt="Use case diagram: generate NPC from natural-language description"
+              loading="lazy"
+            />
+            <figcaption><strong>Use case diagram (UC-1).</strong> Generate an NPC from natural-language input and inject it into the running scene.</figcaption>
+          </figure>
+
+          <ul class="subList">
+            <li><strong>UC-1 (Main flow):</strong> user inputs text → LLM returns JSON → system validates → assembles prefab → spawns NPC.</li>
+            <li><strong>Error paths:</strong> invalid JSON / timeout / missing assets → show error + fallback NPC, without freezing gameplay.</li>
+            <li><strong>Key FRs:</strong> blueprint selector, text box, generate button (disabled while running), status indicator, JSON binding, prefab assembly, runtime injection.</li>
+            <li><strong>Key NFRs:</strong> reliability (no crash on LLM failure), schema validation, placeholder assets on import failure, scalability (swap LLM), security (sanitize input), maintainability (decouple assembly from game logic).</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+  <section class="section">
+  <div class="container">
+    <div class="panel caseBody reveal">
+      <h2>Project Management</h2>
+
+      <p>
+        Managed the dissertation with a Gantt-planned schedule and weekly self-reviews. I deliberately prioritised
+        a robust, testable attribute-tuning pipeline before expanding to full text-to-NPC generation,
+        keeping progress predictable under uncertainty and limited compute.
+      </p>
+
+      <figure class="archFigure">
+            <img
+              src="unity/Plan.png"
+              alt="Use case diagram: generate NPC from natural-language description"
+              loading="lazy"
+            />
+            <figcaption><strong>Gantt Chart:</strong> Work Plan. </figcaption>
+          </figure>
+
+      <ul>
+        <li>
+          <strong>Planned work + deviations:</strong> Started with a staged plan (setup → pipeline → evaluation), then refined scope
+          to <em>attribute-level generation first</em>. Full spritesheet and behaviour synthesis were postponed due to uncertainty
+          around determinism, Unity asset stability, and controllability.
+        </li>
+
+        <li>
+          <strong>Time & resource strategy:</strong> Deployed the local LLM earlier than planned (lower integration cost than expected),
+          and reused an MIT-licensed Vampire Survivors–style prototype to avoid building a full game from scratch—freeing time for
+          schema design, prompt stability, and validation.
+        </li>
+
+        <li>
+          <strong>Risk control + monitoring:</strong> Built validation and schema constraints before trusting any generative output,
+          isolated LLM integration as a separate module to reduce refactor risk, and tracked slippage via weekly check-ins—breaking
+          unstable tasks (prompt tuning / schema refinement) into smaller milestones to maintain momentum.
+        </li>
+      </ul>
+
+      <!-- Optional: one-liner future work for the portfolio (keep it short) -->
+      <p style="margin-top:12px; opacity:.85">
+        <strong>Next:</strong> extend from attribute-only to full generation with spritesheet tooling, behaviour tags + validation,
+        and a more systematic evaluation of latency, correctness, and usability.
+      </p>
+    </div>
+  </div>
+</section>
+    
+
+<section class="section">
+  <div class="container twoCol1">
+    <!-- LEFT: Current Status -->
+    <div class="panel caseBody reveal">
+      <h2>Current Status</h2>
+      <p>
+        This dissertation project is still in progress, so a final “shippable” delivery is not yet complete.
+        The current focus is stabilising the end-to-end text→NPC tuning pipeline (prompt → JSON → validation → blueprint binding → runtime update)
+        before expanding scope to full asset/behaviour generation and formal evaluation.
+      </p>
+
+      <div class="testGrid">
+        <div class="testCard">
+          <div class="k"><strong>What’s working now</strong></div>
+          <ul class="subList">
+            <li>Core text-to-spec flow: natural-language instruction → structured JSON output.</li>
+            <li>Schema + validation layer (syntax/type checks, allowed-key enforcement, safe fallbacks).</li>
+            <li>Unity-side binding: applying validated attribute updates to MonsterBlueprint/runtime entities.</li>
+          </ul>
+        </div>
+
+        <div class="testCard">
+          <div class="k"><strong>In progress</strong></div>
+          <ul class="subList">
+            <li>Stronger prompt stability and edge-case handling (timeouts, partial JSON, missing fields).</li>
+            <li>Visual pipeline (spritesheet generation/import) and behaviour-style expansion.</li>
+            <li>Packaging the tuning UI into a cleaner “Monster AI Tuner” tool workflow.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Evaluation / Validation -->
+    <div class="panel caseBody reveal">
+      <h2>Validation (So Far)</h2>
+      <p>
+        Since the system is not final, evaluation is currently focused on engineering validation: correctness of JSON outputs,
+        robustness of recovery paths, and ensuring runtime injection never breaks the gameplay loop. Formal user testing and
+        performance benchmarking are planned once the pipeline stabilises.
+      </p>
+
+      <div class="testGrid">
+        <div class="testCard">
+          <div class="k"><strong>What I’m checking</strong></div>
+          <ul class="subList">
+            <li>Reliability: invalid JSON / timeouts → graceful fallback (no freezes, no crashes).</li>
+            <li>Correctness: generated fields map to the intended blueprint attributes (HP/ATK/speed, etc.).</li>
+            <li>Gameplay safety: spawned/tuned NPCs do not corrupt existing game state or assets.</li>
+          </ul>
+        </div>
+
+        <div class="testCard">
+          <div class="k"><strong>Next evaluation steps</strong></div>
+          <ul class="subList">
+            <li>Latency measurement (LLM request → validated spec → runtime update) under standard conditions.</li>
+            <li>Usability study: expert vs. non-expert tuning workflows and UI clarity.</li>
+            <li>Stress tests: high-density NPC scenarios to verify stability under load.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+    <section class="section">
+      <div class="container">
+        <div class="panel caseBody reveal">
+          <h2 class="cta" id = "cta">Documents & Links</h2>
+          <div class="docsBtns">
+            <a class="btn" href="unity/Individual_Iterm_report.pdf" target="_blank" rel="noopener">interim Report</a>
+            <a class="btn" href="unity/VampireSurvivorsClone-main.zip" download>
+              Download Project (.zip)
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="section">
+      <div class="container twoCol">
+        <div class="panel reveal">
+          <h2>Contact</h2>
+          <p>
+            Email is fastest. If you include a link to a project, I’ll reply with the relevant build/video and implementation notes.
+          </p>
+          <div class="cta" style="margin-top:12px">
+            <a class="btn primary" href="mailto:ssyjz21@nottingham.ac.uk">ssyjz21@nottingham.ac.uk</a>
+            <a class="btn" href="https://projects.cs.nott.ac.uk/ssyjz21" target="_blank" rel="noopener">GitLab</a>
+            <a class="btn" href="https://www.linkedin.com/in/jirui-zhang-a922ab3a2" target="_blank" rel="noopener">LinkedIn</a>
+          </div>
+        </div>
+
+        <div class="panel reveal">
+          <h2>Reviewer mode</h2>
+          <p>
+            Each project page follows the same structure:
+            <span class="grad" style="font-weight:650">TL;DR → demo → my role → tech breakdown → Project Management → Result & Evaluation</span>.
+            That consistency helps reviewers compare quickly.
+          </p>
+        </div>
+      </div>
+    </section>
+
+
+    <footer class="footer">
+      <div class="container row between wrap">
+        <div>© <span id="year"></span> Jirui Zhang</div>
+        <div class="row wrap" style="gap:12px">
+          <a href="../index.html">Home</a>
+          <a href="../index.html#contact">Contact</a>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <script src="../assets/app.js" defer></script>
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

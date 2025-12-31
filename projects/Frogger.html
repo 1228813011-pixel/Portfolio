@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <script>
+    (function () {
+      try {
+        var root = document.documentElement;
+
+        // 1) 先把 theme 写到 html 上，避免 dark -> light 闪烁
+        var THEME_KEY = "etcpfolio.theme";
+        var saved = localStorage.getItem(THEME_KEY);
+        var prefersLight = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches;
+        root.setAttribute("data-theme", saved || (prefersLight ? "light" : "dark"));
+
+        // 2) 再决定要不要直接跳过 splash
+        if (localStorage.getItem("jrui.splashNever") === "1") {
+          root.classList.add("splash-skip");
+        }
+      } catch (e) {}
+    })();
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Frogger</title>
+  <meta name="description" content="Case study: demo + your role + technical breakdown + iteration + outcomes." />
+  <meta name="color-scheme" content="dark light">
+  <link rel="stylesheet" href="../assets/style.css" />
+</head>
+
+<body>
+  <header class="nav">
+    <div class="container navInner row between">
+      <a class="brand" href="../index.html">
+        <span class="dot" aria-hidden="true"></span>
+        <span>Jirui Zhang</span>
+      </a>
+      
+      
+      <nav class="navLinks" aria-label="Primary">
+        <a href="../index.html#projects">Home</a>
+        <a href="#cta">Documents</a>
+        <a href="frog/frogger-refactor-coursework-jirui-zhang-main.zip" download>Download</a>
+        <a href="#contact">Contact</a>
+        <button id="themeToggle" class="iconBtn" type="button" aria-label="Toggle theme">
+          <span id="themeIcon" aria-hidden="true">🌙</span>
+          <span id="themeLabel">Dark</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="heroMini">
+      <div class="container">
+        <div class="breadcrumbs reveal">
+          <a href="../index.html#projects">Projects</a> <span aria-hidden="true">/</span> <span>Frogger</span>
+        </div>
+
+        <h1 class="reveal" style="font-size: clamp(34px, 5vw, 52px); margin-top: 10px;">
+          Frogger: Test-Driven <span class="grad">Refactoring</span>
+        </h1>
+
+        <p class="sub reveal" style="max-width: 80ch;">
+          A JavaFX Frogger game refactored into an MVC architecture with design-pattern improvements and a strong unit-test suite,
+          plus gameplay features.
+        </p>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top: 10px;">
+      <div class="container caseGrid">
+        <div class="caseMedia reveal">
+          <div class="frame">
+            <video class="frameMedia"
+                  src="frog/Frogger_Live_Video.mp4"
+                  controls
+                  playsinline
+                  preload="metadata"
+                  poster="frog/frog.png">
+            </video>
+          </div>
+        </div>
+
+        <aside class="caseAside reveal">
+          <div class="panel">
+            <h2 style="margin:0 0 10px;">TL;DR</h2>
+
+            <div class="kv">
+              <div class="kvItem">
+                <div class="k">Role</div>
+                <div class="v">Solo Developer</div>
+                <div class="small">Test-driven refactor + feature extensions</div>
+              </div>
+
+              <div class="kvItem">
+                <div class="k">Stack</div>
+                <div class="v">Java • JavaFX • JUnit • Mockito</div>
+                <div class="small">MVC architecture + local leaderboard storage</div>
+              </div>
+
+              <div class="kvItem">
+                <div class="k">Time & Module</div>
+                <div class="v">Developing Maintainable Software: 10/2024 - 01/2025 </div>
+              </div>
+
+              <div class="kvItem">
+                <div class="k">Outcome</div>
+                <div class="v">MVC refactor + 78 unit tests + extended gameplay features</div>
+              </div>
+            </div>
+
+            <div class="pills" style="margin-top:12px">
+              <span class="pill">JavaFX</span>
+              <span class="pill">MVC</span>
+              <span class="pill">TDD</span>
+              <span class="pill">Refactoring</span>
+              <span class="pill">Unit Tests</span>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+<section class="section">
+  <div class="container">
+    <div class="panel caseBody reveal">
+      <h2>My Contributions</h2>
+      <ul>
+        <li><strong>MVC refactor:</strong> Restructured the original Frogger codebase into a clear Model–View–Controller architecture, improving separation of concerns and reducing tight coupling.</li>
+
+        <li><strong>Test-driven improvements:</strong> Built a comprehensive unit test suite (78 tests) using JUnit + Mockito, focusing on game logic and controller behaviour while keeping UI concerns isolated.</li>
+
+        <li><strong>Design patterns & maintainability:</strong> Applied maintainability-focused refactoring (SOLID principles, dependency injection where appropriate) and addressed common code smells to make the codebase easier to extend.</li>
+
+        <li><strong>Feature extensions:</strong> Implemented gameplay and UX additions such as settings (volume/difficulty), timed ending, save checkpoints, and optional hazards (e.g., dinosaur events) to enrich the original loop.</li>
+
+        <li><strong>Persistence & leaderboard:</strong> Added a Top-10 leaderboard backed by a local score database, including score submission and retrieval integrated into the menu flow.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+    
+<section class="section">
+  <div class="container">
+    <div class="panel caseBody reveal">
+      <h2>Technical Breakdown</h2>
+      <ul>
+        <li>
+          <strong>Architecture (MVC):</strong>
+          Refactored the codebase into a clear Model–View–Controller structure. Game rules and state updates live in the Model,
+          the JavaFX rendering stays in the View, and input + orchestration are handled by Controllers. This separation reduced
+          coupling and made feature additions (settings, leaderboard, checkpoints) predictable.
+
+          <figure class="archFigure">
+            <img
+              src="frog/mvc.png"
+              alt="MVC architecture diagram: Model, View (JavaFX), Controller"
+              loading="lazy"
+            />
+          </figure>
+        </li>
+
+        <li>
+          <strong>Testing & Maintainability:</strong>
+          Built a unit-test suite (78 tests) with JUnit and Mockito to validate core logic without relying on UI automation.
+          Used mocking to isolate dependencies and refactored toward SOLID-style responsibilities to remove common code smells
+          and make behaviour easier to verify.
+
+          <ul class="subList">
+            <li>Focus: Model + Controller behaviour (rules, collisions, scoring, state transitions).</li>
+            <li>Approach: Mockito for dependency isolation; avoid fragile end-to-end UI tests where possible.</li>
+            <li>Outcome: safer refactors and faster iteration when extending the game.</li>
+          </ul>
+        </li>
+
+        <li>
+          <strong>Features & Persistence:</strong>
+          Extended the original Frogger with usability and gameplay improvements, plus persistent scoring.
+
+          <ul class="subList">
+            <li>Settings: user-adjustable options (e.g., volume / difficulty) integrated into the menu flow.</li>
+            <li>Gameplay extensions: timed ending, checkpoints, and additional hazards/events (e.g., dinosaur encounters).</li>
+            <li>Leaderboard: Top-10 scores stored and loaded from a local database for repeatable evaluation.</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="panel caseBody reveal">
+      <h2>Project Management</h2>
+
+      <p>
+        I managed development with a GitLab-first workflow: small feature branches, frequent merges, and CI checks to keep the
+        game always buildable. The implementation was test-driven refactoring—unit tests protected core logic while I iterated
+        on features and architecture.
+      </p>
+
+      <ul>
+        <li>
+          <strong>Branching & integration:</strong>
+          Worked on isolated feature branches, merged into <em>develop</em> and then into
+          <em>main</em>. This kept changes reviewable and avoided “big-bang” integration.
+        </li>
+
+        <li>
+          <strong>CI / build verification:</strong>
+          Used automated builds as a quality gate (build must pass before merge). This provided fast feedback and reduced
+          last-minute breakages when combining features.
+        </li>
+
+        <li>
+          <strong>Test-driven refactoring:</strong>
+          Maintained a unit-test suite (focused on controllers and models) and used mocking (Mockito) to isolate logic.
+          UI/View was validated via manual / end-to-end checks rather than unit tests.
+        </li>
+
+        <li>
+          <strong>Refactor milestones (maintainability):</strong>
+          Re-structured the code into clear packages and an MVC architecture - Model for data/resources and game entities,
+          View for JavaFX UI/backgrounds, and Controllers for gameplay orchestration. This reduced coupling and made later
+          additions (settings, leaderboard, checkpoints) more predictable.
+        </li>
+      </ul>
+
+    </div>
+  </div>
+</section>
+    
+
+<section class="section">
+  <div class="container twoCol1">
+    <!-- LEFT: Results -->
+    <div class="panel caseBody reveal">
+      <h2>Results</h2>
+      <p>
+        Delivered a refactored and extended Frogger game with a maintainable MVC architecture. The final build includes
+        new gameplay/UX features (settings, timed ending, hazards) and a persistent Top-10 leaderboard, supported by a
+        comprehensive unit test suite.
+      </p>
+
+      <div class="testGrid">
+        <div class="testCard">
+          <div class="k"><strong>What shipped</strong></div>
+          <ul class="subList">
+            <li>MVC refactor with clearer separation of game rules (Model), rendering (View), and orchestration (Controllers).</li>
+            <li>Feature extensions: settings menu, timed ending, and additional hazards/events (e.g., Dinosaur).</li>
+            <li>Top-10 leaderboard with local persistence (score submission + retrieval in the menu flow).</li>
+          </ul>
+        </div>
+
+        <div class="testCard">
+          <div class="k"><strong>Engineering highlights</strong></div>
+          <ul class="subList">
+            <li>78 unit tests using JUnit, with Mockito to isolate dependencies and test controller/model logic.</li>
+            <li>Refactoring focused on maintainability: reduced coupling, improved package structure, and removed code smells.</li>
+            <li>GitLab workflow: feature branches merged into develop/main with build checks to keep the project always runnable.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Evaluation -->
+    <div class="panel caseBody reveal">
+      <h2>Evaluation</h2>
+      <p>
+        Evaluated through automated unit testing for core logic plus manual gameplay validation for UI flows. The focus was
+        stability during refactoring (no regressions), correctness of scoring/state transitions, and feature reliability after merges.
+      </p>
+
+      <div class="testGrid">
+        <div class="testCard">
+          <div class="k"><strong>Test coverage</strong></div>
+          <ul class="subList">
+            <li>Model rules: collisions, scoring, win/lose conditions, and timed ending behaviour.</li>
+            <li>Controller logic: input handling, scene/state switching, and menu → gameplay → results flow.</li>
+            <li>Persistence: leaderboard read/write and edge cases (empty/invalid entries).</li>
+          </ul>
+        </div>
+
+        <div class="testCard">
+          <div class="k"><strong>Iteration highlights</strong></div>
+          <ul class="subList">
+            <li>Used tests to safely refactor toward MVC without breaking gameplay behaviour.</li>
+            <li>Fixed bugs discovered during feature-branch integration (e.g., Dino/audio/test issues) and re-ran builds.</li>
+            <li>Refined UI/UX details (menus, icons, settings defaults) after quick play checks.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+    <section class="section">
+      <div class="container">
+        <div class="panel caseBody reveal">
+          <h2 class="cta" id = "cta">Documents & Links</h2>
+          <div class="docsBtns">
+            <a class="btn" href="frog/JiruiZhang_part2.pdf" target="_blank" rel="noopener">Academic Report</a>
+            <a class="btn" href="frog/guideline.pdf" target="_blank" rel="noopener">Game Tutorial</a>
+            <a class="btn" href="frog/frogger-refactor-coursework-jirui-zhang-main.zip" download>
+              Download Project (.zip)
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="section">
+      <div class="container twoCol">
+        <div class="panel reveal">
+          <h2>Contact</h2>
+          <p>
+            Email is fastest. If you include a link to a project, I’ll reply with the relevant build/video and implementation notes.
+          </p>
+          <div class="cta" style="margin-top:12px">
+            <a class="btn primary" href="mailto:ssyjz21@nottingham.ac.uk">ssyjz21@nottingham.ac.uk</a>
+            <a class="btn" href="https://projects.cs.nott.ac.uk/ssyjz21" target="_blank" rel="noopener">GitLab</a>
+            <a class="btn" href="https://www.linkedin.com/in/jirui-zhang-a922ab3a2" target="_blank" rel="noopener">LinkedIn</a>
+          </div>
+        </div>
+
+        <div class="panel reveal">
+          <h2>Reviewer mode</h2>
+          <p>
+            Each project page follows the same structure:
+            <span class="grad" style="font-weight:650">TL;DR → demo → my role → tech breakdown → Project Management → Result & Evaluation</span>.
+            That consistency helps reviewers compare quickly.
+          </p>
+        </div>
+      </div>
+    </section>
+
+
+    <footer class="footer">
+      <div class="container row between wrap">
+        <div>© <span id="year"></span> Jirui Zhang</div>
+        <div class="row wrap" style="gap:12px">
+          <a href="../index.html">Home</a>
+          <a href="../index.html#contact">Contact</a>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <script src="../assets/app.js" defer></script>
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

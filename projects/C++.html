@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <script>
+    (function () {
+      try {
+        var root = document.documentElement;
+
+        // 1) 先把 theme 写到 html 上，避免 dark -> light 闪烁
+        var THEME_KEY = "etcpfolio.theme";
+        var saved = localStorage.getItem(THEME_KEY);
+        var prefersLight = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches;
+        root.setAttribute("data-theme", saved || (prefersLight ? "light" : "dark"));
+
+        // 2) 再决定要不要直接跳过 splash
+        if (localStorage.getItem("jrui.splashNever") === "1") {
+          root.classList.add("splash-skip");
+        }
+      } catch (e) {}
+    })();
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Skeleton</title>
+  <meta name="description" content="Case study: demo + your role + technical breakdown + iteration + outcomes." />
+  <meta name="color-scheme" content="dark light">
+  <link rel="stylesheet" href="../assets/style.css" />
+</head>
+
+<body>
+  <header class="nav">
+    <div class="container navInner row between">
+      <a class="brand" href="../index.html">
+        <span class="dot" aria-hidden="true"></span>
+        <span>Jirui Zhang</span>
+      </a>
+      
+      
+      <nav class="navLinks" aria-label="Primary">
+        <a href="../index.html#projects">Home</a>
+        <a href="#cta">Documents</a>
+        <a href="c++/CPPCoursework_JiruiZhang.zip" download>Download</a>
+        <a href="#contact">Contact</a>
+        <button id="themeToggle" class="iconBtn" type="button" aria-label="Toggle theme">
+          <span id="themeIcon" aria-hidden="true">🌙</span>
+          <span id="themeLabel">Dark</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="heroMini">
+      <div class="container">
+        <div class="breadcrumbs reveal">
+          <a href="../index.html#projects">Projects</a> <span aria-hidden="true">/</span> <span>Skeleton</span>
+        </div>
+        <h1 class="reveal" style="font-size: clamp(34px, 5vw, 52px); margin-top: 10px;">
+          Skeleton: Castlevania-style <span class="grad">action Game</span>
+        </h1>
+        <p class="sub reveal" style="max-width: 80ch;">
+          A 2D platform action game in which the player controls a skeleton hero who navigates a procedurally generated cemetery level, survives patrolling werewolves, and defeats a boss knight.
+      </div>
+    </section>
+
+    <section class="section" style="padding-top: 10px;">
+      <div class="container caseGrid">
+        <div class="caseMedia reveal">
+          <div class="frame">
+            <video class="frameMedia"
+                  src="c++/Demo_Video.mp4"
+                  controls
+                  playsinline
+                  preload="metadata"
+                  poster="c++/C++.png">
+            </video>
+          </div>
+        </div>
+
+        <aside class="caseAside reveal">
+          <div class="panel">
+            <h2 style="margin:0 0 10px;">TL;DR</h2>
+            <div class="kv">
+              <div class="kvItem">
+                <div class="k">Role</div>
+                <div class="v">Solo Developer</div>
+                <div class="small">Coursework implementation + report</div>
+              </div>
+              <div class="kvItem">
+                <div class="k">Stack</div>
+                <div class="v">C++ • Custom 2D Engine</div>
+              </div>
+              <div class="kvItem">
+                <div class="k">Time & Module</div>
+                <div class="v">C++ Programming: 03/2025–05/2025</div>
+              </div>
+              <div class="kvItem">
+                <div class="k">Outcome</div>
+                <div class="v">Playable game + demo video + documents</div>
+              </div>
+            </div>
+            <div class="pills" style="margin-top:12px">
+              <span class="pill">2D Pixel</span>
+              <span class="pill">C++</span>
+              <span class="pill">Intelligent Agents</span>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section">
+  <div class="container">
+    <div class="panel caseBody reveal">
+      <h2>My Contributions</h2>
+      <ul>
+        <li><strong>State-driven game flow:</strong> Implemented the full state system (Start, Intro, Name, Loading, Running, Pause, Win, Lose) with animated/changing backgrounds and UI transitions.</li>
+
+        <li><strong>Procedural level & tiles:</strong> Built a tile/level system for a procedurally generated cemetery, including hazards and interactive tiles (fire damage, water slowdown, and a wizard tile that triggers rain to extinguish fires).</li>
+
+        <li><strong>Player combat & classes:</strong> Implemented three playable skeleton classes (Normal, Archer, Warrior) with distinct movement/attacks, health display, and input controls.</li>
+
+        <li><strong>Enemy & boss AI:</strong> Implemented werewolf enemies and the knight boss with behaviour-tree style logic, plus a companion pet dog entity and its AI behaviour.</li>
+
+        <li><strong>Camera & persistence features:</strong> Added scrolling/zoom controls for the scene and implemented save/load (F5/F9) with gameplay-safe constraints.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+    
+    <section class="section">
+  <div class="container">
+    <div class="panel caseBody reveal">
+      <h2>Technical Breakdown</h2>
+      <ul>
+        <li>
+          <strong>Architecture:</strong>
+          State-driven flow with dedicated screens for Start → Intro → Name → Loading → Running, plus Pause / Win / Lose.
+          The Running State hosts the core loop (combat, AI, tiles, progression) while UI and animated backgrounds are handled per-state.
+          <figure class="archFigure">
+            <!-- Replace with your own diagram/screenshot path -->
+            <img
+              src="c++/c.png"
+              alt="State flow diagram: Start, Intro, Name, Loading, Running, Pause, Win, Lose"
+              loading="lazy"
+            />
+          </figure>
+        </li>
+
+        <li>
+          <strong>World & Systems:</strong>
+          Procedurally generated cemetery level built with a tile manager. Tiles include hazards and interactions:
+          fire (damage), water (slow), and a wizard tile that triggers rain to extinguish fires. Collision uses a mix of solid box collision
+          and pixel-accurate checks where needed.
+          <ul class="subList">
+            <li>Player: three classes (Normal / Archer / Warrior) with distinct speed/attacks.</li>
+            <li>Enemies: werewolves + boss knight with behaviour-tree style logic.</li>
+            <li>Companion: pet dog entity with its own behaviour logic.</li>
+          </ul>
+        </li>
+
+        <li>
+          <strong>Interaction:</strong>
+          Keyboard + mouse controls for movement/combat, with camera/navigation tools for the scrolling/zoomable scene.
+          <ul class="subList">
+            <li>Movement: A/D walk, Shift+A/D run, W jump, S crouch.</li>
+            <li>Combat: Left click Attack 1, Right click Attack 2; 1/2/3 to switch class.</li>
+            <li>Game flow: P to pause; F5 save and F9 load (save-before-load constraint).</li>
+            <li>View controls: Q/E scroll background; Z/X zoom (with boundaries).</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+    <section class="section">
+  <div class="container">
+    <div class="panel caseBody reveal">
+      <h2>Project Management</h2>
+
+      <p>
+        Managed the project as a sequence of small milestones aligned with the coursework requirements.
+        I iterated feature-by-feature (core loop → states/UI → procedural level → AI/combat → save/load),
+        keeping each milestone playable before moving on. Each iteration ended with quick regression checks
+        to avoid breaking state transitions and gameplay flow.
+      </p>
+
+      <ul>
+        <li>
+          <strong>Milestone planning:</strong> Broke the build into deliverable checkpoints—state system and UI flow,
+          then procedural cemetery generation, then enemy/boss behaviours and combat tuning, and finally polish
+          (camera scroll/zoom, balance, bug fixes).
+        </li>
+
+        <li>
+          <strong>Risk-first implementation:</strong> Prioritised high-risk systems early (procedural generation and
+          state transitions) so issues surfaced quickly. Later features (extra classes, pet AI, visual polish) were
+          layered on once the core loop was stable.
+        </li>
+
+        <li>
+          <strong>Testing & iteration:</strong> Used frequent playtesting and focused test cases for edge conditions
+          (e.g., save/load safety, collision boundaries, AI spawn timing). Iterated based on observed pain points,
+          especially early difficulty spikes and control clarity.
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+    
+
+    <section class="section">
+  <div class="container twoCol1">
+    <!-- LEFT: Results -->
+    <div class="panel caseBody reveal">
+      <h2>Results</h2>
+      <p>
+        Delivered a playable C++ 2D platform action game where the player controls a skeleton hero navigating a procedurally
+        generated cemetery, surviving patrolling werewolves, and defeating a knight boss. The build includes a complete
+        gameplay loop (exploration → combat → progression → boss fight) and a state-driven UI flow.
+      </p>
+
+      <div class="testGrid">
+        <div class="testCard">
+          <div class="k"><strong>What shipped</strong></div>
+          <ul class="subList">
+            <li>Full state flow: Start/Intro/Name/Loading/Running + Pause/Win/Lose.</li>
+            <li>Procedural cemetery generation with interactive tiles and hazards.</li>
+            <li>Three playable classes (Normal/Archer/Warrior) with distinct attacks.</li>
+          </ul>
+        </div>
+
+        <div class="testCard">
+          <div class="k"><strong>Engineering highlights</strong></div>
+          <ul class="subList">
+            <li>Enemy + boss AI logic (patrol/chase/attack decision flow).</li>
+            <li>Save/Load support (F5/F9) with safe constraints to prevent invalid restores.</li>
+            <li>Camera tools: scrolling and zooming with boundary handling.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Evaluation -->
+    <div class="panel caseBody reveal">
+      <h2>Evaluation</h2>
+      <p>
+        Validated via iterative in-house playtesting and systematic feature checks across states, combat, AI behaviours,
+        and procedural generation. Focus areas were stability (no soft-locks), readability of controls, and fairness of
+        difficulty progression.
+      </p>
+
+      <div class="testGrid">
+        <div class="testCard">
+          <div class="k"><strong>Test coverage</strong></div>
+          <ul class="subList">
+            <li>State transitions: consistent entry/exit, pause/resume, win/lose handling.</li>
+            <li>Procedural maps: multiple seeds, collision safety, reachable paths.</li>
+            <li>Combat balance: class differences, damage/health tuning, boss patterns.</li>
+          </ul>
+        </div>
+
+        <div class="testCard">
+          <div class="k"><strong>Iteration highlights</strong></div>
+          <ul class="subList">
+            <li>Adjusted enemy spawn/behaviour timing to reduce “unfair” early pressure.</li>
+            <li>Improved clarity of controls (on-screen hints + safer defaults).</li>
+            <li>Refined save/load rules and camera bounds to prevent edge-case bugs.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+    <section class="section">
+      <div class="container">
+        <div class="panel caseBody reveal">
+          <h2 class="cta" id = "cta">Documents & Links</h2>
+          <div class="docsBtns">
+            <a class="btn" href="c++/C++.pdf" target="_blank" rel="noopener">Academic Report</a>
+            <a class="btn" href="c++/CPPCoursework_JiruiZhang.zip" download>
+              Download Project (.zip)
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="section">
+      <div class="container twoCol">
+        <div class="panel reveal">
+          <h2>Contact</h2>
+          <p>
+            Email is fastest. If you include a link to a project, I’ll reply with the relevant build/video and implementation notes.
+          </p>
+          <div class="cta" style="margin-top:12px">
+            <a class="btn primary" href="mailto:ssyjz21@nottingham.ac.uk">ssyjz21@nottingham.ac.uk</a>
+            <a class="btn" href="https://projects.cs.nott.ac.uk/ssyjz21" target="_blank" rel="noopener">GitLab</a>
+            <a class="btn" href="https://www.linkedin.com/in/jirui-zhang-a922ab3a2" target="_blank" rel="noopener">LinkedIn</a>
+          </div>
+        </div>
+
+        <div class="panel reveal">
+          <h2>Reviewer mode</h2>
+          <p>
+            Each project page follows the same structure:
+            <span class="grad" style="font-weight:650">TL;DR → demo → my role → tech breakdown → Project Management → Result & Evaluation</span>.
+            That consistency helps reviewers compare quickly.
+          </p>
+        </div>
+      </div>
+    </section>
+
+
+    <footer class="footer">
+      <div class="container row between wrap">
+        <div>© <span id="year"></span> Jirui Zhang</div>
+        <div class="row wrap" style="gap:12px">
+          <a href="../index.html">Home</a>
+          <a href="../index.html#contact">Contact</a>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <script src="../assets/app.js" defer></script>
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <script>
+    (function () {
+      try {
+        var root = document.documentElement;
+
+        // 1) 先把 theme 写到 html 上，避免 dark -> light 闪烁
+        var THEME_KEY = "etcpfolio.theme";
+        var saved = localStorage.getItem(THEME_KEY);
+        var prefersLight = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches;
+        root.setAttribute("data-theme", saved || (prefersLight ? "light" : "dark"));
+
+        // 2) 再决定要不要直接跳过 splash
+        if (localStorage.getItem("jrui.splashNever") === "1") {
+          root.classList.add("splash-skip");
+        }
+      } catch (e) {}
+    })();
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>VR Rehab MiniGames</title>
+  <meta name="description" content="Case study: demo + your role + technical breakdown + iteration + outcomes." />
+  <meta name="color-scheme" content="dark light">
+  <link rel="stylesheet" href="../assets/style.css" />
+</head>
+
+<body>
+  <header class="nav">
+    <div class="container navInner row between">
+      <a class="brand" href="../index.html">
+        <span class="dot" aria-hidden="true"></span>
+        <span>Jirui Zhang</span>
+      </a>
+      
+      
+      <nav class="navLinks" aria-label="Primary">
+        <a href="../index.html#projects">Home</a>
+        <a href="#cta">Documents</a>
+        <a href="vr/team44_project-main.zip" download>Download</a>
+        <a href="#contact">Contact</a>
+        <button id="themeToggle" class="iconBtn" type="button" aria-label="Toggle theme">
+          <span id="themeIcon" aria-hidden="true">🌙</span>
+          <span id="themeLabel">Dark</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="heroMini">
+      <div class="container">
+        <div class="breadcrumbs reveal">
+          <a href="../index.html#projects">Projects</a> <span aria-hidden="true">/</span> <span>VR Rehab Mini‑Games</span>
+        </div>
+        <h1 class="reveal" style="font-size: clamp(34px, 5vw, 52px); margin-top: 10px;">
+          Re-Tread: VR Rehab <span class="grad"> Mini‑Games</span>
+        </h1>
+        <p class="sub reveal" style="max-width: 80ch;">
+          A suite of VR rehab mini‑games designed for repeatable training: simple to learn and tuned for comfort and lower limb rehabilitation.
+        </p>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top: 10px;">
+      <div class="container caseGrid">
+        <div class="caseMedia reveal">
+          <div class="frame">
+            <video class="frameMedia"
+                  src="vr/demo-vid.mp4"
+                  controls
+                  playsinline
+                  preload="metadata"
+                  poster="vr/Amusement_Park.png">
+            </video>
+          </div>
+        </div>
+
+        <aside class="caseAside reveal">
+          <div class="panel">
+            <h2 style="margin:0 0 10px;">TL;DR</h2>
+            <div class="kv">
+              <div class="kvItem">
+                <div class="k">Role</div>
+                <div class="v">Gameplay Systems Leader</div>
+                <div class="small">Three minigames and Game Hub</div>
+              </div>
+              <div class="kvItem">
+                <div class="k">Stack</div>
+                <div class="v">Unreal Engine 5 • VR</div>
+                <div class="small">Motus Explore treadmill input + standalone VR build (Meta Quest 2)</div>
+              </div>
+              <div class="kvItem">
+                <div class="k">Time & Company</div>
+                <div class="v">MotusVR: 10/2024–05/2025</div>
+              </div>
+              <div class="kvItem">
+                <div class="k">Outcome</div>
+                <div class="v">Playable games + playtest notes + documents</div>
+              </div>
+            </div>
+            <div class="pills" style="margin-top:12px">
+              <span class="pill">VR</span>
+              <span class="pill">UE5</span>
+              <span class="pill">Interaction</span>
+              <span class="pill">Performance</span>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="panel caseBody reveal">
+          <h2>My personal Contributions</h2>
+          <ul>
+            <li><strong>Core gameplay systems:</strong> Built the Maze and Chase mini-games, including procedural map generation, coin collection, enemy AI, player health/damage, and win/lose flows.</li>
+
+            <li><strong>Team leadership (mini-group):</strong> Scoped and coordinated tasks across Maze/Chase/Red Light–Green Light, aligning implementations and integration milestones.</li>
+
+            <li><strong>Co-development:</strong> Implemented Red Light–Green Light and the central Game Hub together with Gang Yang (shared logic, UI entry flow, and integration).</li>
+
+            <li><strong>Documentation & reporting:</strong> Authored major sections of the interim and final reports (background, requirements & critical analysis, game design, project management), and produced the system architecture diagram.</li>
+
+            <li><strong>Process & version control:</strong> Maintained the Git workflow and recorded team meeting notes during the first semester; wrote the overall structure for the report, User Manual, and Software Manual.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    
+    <section class="section">
+      <div class="container">
+        <div class="panel caseBody reveal">
+          <h2>Technical Breakdown</h2>
+          <ul>
+            <li><strong>Architecture:</strong> Modular pipeline: treadmill/controllers/head tracking are normalized by an Input Manager, then fed into a game-logic core (movement, AI, difficulty, interactables).
+  UI/UX and telemetry/settings attach as side modules, while a hardware-abstraction layer isolates Quest/VR SDK specifics for portability and testing.
+              <figure class="archFigure">
+                <img
+                  src="vr/vr-arch.png"
+                  alt="System architecture diagram: input, input manager, game logic core, UI/UX, data management, hardware abstraction"
+                  loading="lazy"
+                />
+              </figure>  
+            </li>
+            <li>
+              <strong>Performance:</strong>
+              Targeted Quest 2 constraints and stabilised frame rate in VR builds:
+              <ul class="subList">
+                <li>Blueprint cost: removed frequent Cast calls; cached refs + Interfaces + Event Dispatchers.</li>
+                <li>Rendering: avoided dynamic lighting; reduced/disabled heavy post-processing (bloom/AO).</li>
+                <li>VFX: redesigned hub portals to remove particles and costly glow materials.</li>
+                <li>Assets: simplified geometry & collisions; added LODs to cut GPU/physics load.</li>
+              </ul>
+            </li>
+
+            <li>
+              <strong>Interaction: Input mappings</strong>
+              <figure class="ctrlFigure">
+                <div class="ctrlGrid">
+                  <div class="ctrlItem"><img src="vr/Control_MappingMaze.png"  alt="Control mapping for Maze & Chase" loading="lazy"></div>
+                  <div class="ctrlItem"><img src="vr/Control_Mapping_UniCycle.png"  alt="Control mapping for UniCycle" loading="lazy"></div>
+                  <div class="ctrlItem"><img src="vr/Control_Mapping_RGL.png"  alt="Control mapping for Red Light Green Light Game" loading="lazy"></div>
+                </div>
+              </figure>
+            </li>
+
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="panel caseBody reveal">
+          <h2>Project Management</h2>
+
+          <p>
+            We ran development as short, time-boxed sprints (1–2 weeks) with a shared Gantt timeline for
+            milestones. Each cycle started with backlog refinement and sprint planning, then ended with a
+            supervisor demo (Sprint Review) and a retrospective. Action items from the retro were carried
+            into the next sprint, keeping progress measurable and feedback-driven.
+          </p>
+          
+          <figure class="archSmall">
+                <img
+                  src="vr/Gannet.png"
+                  alt="System architecture diagram: input, input manager, game logic core, UI/UX, data management, hardware abstraction"
+                  loading="lazy"
+                />
+          </figure>
+
+          <ul>
+            <li>
+              <strong>Process adjustment:</strong> We initially used Jira for sprint tracking and traceability,
+              but as the core implementation team became smaller, we switched to a lighter workflow
+              (Discord for rapid coordination + GitLab Merge Requests as the “source of truth”) while
+              keeping the sprint cadence and reviews.
+            </li>
+            <li>
+              <strong>Collaboration fix:</strong> Unreal projects are asset-heavy and many files are binary,
+              making merges slow and manual. We adopted Git LFS, merged little-and-often, and required
+              peer-reviewed Merge Requests. When two branches diverged heavily, we enforced a short
+              feature freeze to safely integrate and validate the build.
+            </li>
+            <li>
+              <strong>Team learning loop:</strong> Early on, we used small “learning projects” to ramp up Unreal
+              skills, shared outcomes across the team, and added structured pair-programming sessions
+              to unblock tricky Blueprint/UI integration tasks.
+            </li>
+          </ul>
+
+        </div>
+      </div>
+    </section>
+
+    
+
+    <section class="section">
+      <div class="container twoCol1">
+        <div class="panel caseBody reveal">
+          <h2>Results</h2>
+            <p>
+              Delivered a functional Unreal Engine 5 prototype for standalone Meta Quest 2, featuring a hub world and four
+              rehab-focused mini-games (Maze, Chase, Red Light/Green Light, Unicycle). The build includes clear gameplay loops
+              (coins, scoring/power-ups), AI-driven challenge (e.g., chasing enemies), and adjustable difficulty to support
+              different ability levels.
+            </p>
+
+
+              <div class="testGrid">
+                <div class="testCard">
+                  <div class="k"><strong>What shipped</strong></div>
+                  <ul class="subList">
+                    <li>Hub world connecting all mini-games with consistent UI and navigation.</li>
+                    <li>Complete game loops: objectives, scoring/rewards, and fail states.</li>
+                    <li>Core systems: health/damage, interactables, and enemy pressure (chase scenarios).</li>
+                  </ul>
+                </div>
+
+                <div class="testCard">
+                  <div class="k"><strong>Engineering highlights</strong></div>
+                  <ul class="subList">
+                    <li>Performance tuned for mobile VR (reduced costly VFX/post-processing and Blueprint overhead).</li>
+                    <li>Comfort-aware controls (discrete turning where needed; consistent mapping across games).</li>
+                    <li>Documentation deliverables: user manual + software manual + final report.</li>
+                  </ul>
+                </div>
+              </div>
+        </div>
+
+        <div class="panel caseBody reveal">
+          <h2>Evaluation (User Testing):</h2>
+                <p>
+                Ran a 10-participant playtest + semi-structured interview (participants with prior rehab / lower-limb injury experience; mixed VR familiarity).
+                Sessions followed: onboarding → hub exploration → Red Light/Green Light → Maze & Unicycle → interview. Consent collected and data anonymised.
+                </p>
+
+                <div class="testGrid">
+                  <div class="testCard">
+                    <div class="k"><strong>Key findings</strong></div>
+                    <ul class="subList">
+                      <li>High engagement across all participants; strong “fun/immersive” feedback.</li>
+                      <li>Usability pain points: menu clarity; some confusion with 90° turn controls.</li>
+                      <li>Comfort: 1/10 reported slight motion sickness; 1/10 reported knee pain (existing injury).</li>
+                    </ul>
+                  </div>
+
+                  <div class="testCard">
+                    <div class="k"><strong>Changes after testing</strong></div>
+                    <ul class="subList">
+                      <li>Added a grace period at the start of the Maze game (zombie not immediately punishing).</li>
+                      <li>Improved guidance for turning controls (reduce head movement; clearer onboarding cues).</li>
+                    </ul>
+                  </div>
+                </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="panel caseBody reveal">
+          <h2 class="cta" id = "cta">Documents & Links</h2>
+          <div class="docsBtns">
+            <a class="btn" href="vr/User.pdf" target="_blank" rel="noopener">User Manual</a>
+            <a class="btn" href="vr/Software.pdf" target="_blank" rel="noopener">Software Manual</a>
+            <a class="btn" href="vr/MotusVR_Final_report.pdf" target="_blank" rel="noopener">Academic Report</a>
+            <a class="btn" href="vr/team44_project-main.zip" download>
+              Download Project (.zip)
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="section">
+      <div class="container twoCol">
+        <div class="panel reveal">
+          <h2>Contact</h2>
+          <p>
+            Email is fastest. If you include a link to a project, I’ll reply with the relevant build/video and implementation notes.
+          </p>
+          <div class="cta" style="margin-top:12px">
+            <a class="btn primary" href="mailto:ssyjz21@nottingham.ac.uk">ssyjz21@nottingham.ac.uk</a>
+            <a class="btn" href="https://projects.cs.nott.ac.uk/ssyjz21" target="_blank" rel="noopener">GitLab</a>
+            <a class="btn" href="https://www.linkedin.com/in/jirui-zhang-a922ab3a2" target="_blank" rel="noopener">LinkedIn</a>
+          </div>
+        </div>
+
+        <div class="panel reveal">
+          <h2>Reviewer mode</h2>
+          <p>
+            Each project page follows the same structure:
+            <span class="grad" style="font-weight:650">TL;DR → demo → my role → tech breakdown → Project Management → Result & Evaluation</span>.
+            That consistency helps reviewers compare quickly.
+          </p>
+        </div>
+      </div>
+    </section>
+
+
+    <footer class="footer">
+      <div class="container row between wrap">
+        <div>© <span id="year"></span> Jirui Zhang</div>
+        <div class="row wrap" style="gap:12px">
+          <a href="../index.html">Home</a>
+          <a href="../index.html#contact">Contact</a>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <script src="../assets/app.js" defer></script>
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

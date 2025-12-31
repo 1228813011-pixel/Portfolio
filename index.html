@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <script>
+    (function () {
+      try {
+        var root = document.documentElement;
+
+        // 1) 先把 theme 写到 html 上，避免 dark -> light 闪烁
+        var THEME_KEY = "etcpfolio.theme";
+        var saved = localStorage.getItem(THEME_KEY);
+        var prefersLight = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches;
+        root.setAttribute("data-theme", saved || (prefersLight ? "light" : "dark"));
+
+        // 2) 再决定要不要直接跳过 splash
+        if (localStorage.getItem("jrui.splashNever") === "1") {
+          root.classList.add("splash-skip");
+        }
+      } catch (e) {}
+    })();
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Jirui Zhang's Portfolio</title>
+  <meta name="description" content="Game / VR / Interactive Systems portfolio. Case studies with technical breakdowns, iteration notes, and playable demos." />
+  <meta name="color-scheme" content="dark light">
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+
+
+
+<body>
+  <div id="splash" class="splash splashMenu" aria-hidden="false">
+
+  <div class="splashBackdrop" aria-hidden="true"></div>
+
+
+  <canvas id="splashFx" class="splashFx" width="480" height="270" aria-hidden="true"></canvas>
+
+
+  <div class="splashUI" role="dialog" aria-label="Start menu">
+    <div class="menuPanel menuFrame">
+      <div class="menuTitle pixelTitle">Welcome to My Game Space</div>
+
+      <div class="menuBtns">
+        <button id="startBtn" class="uiBtn uiBtn--enter" type="button">
+          <span class="uiBtnText">Enter</span>
+        </button>
+
+        <button id="neverBtn" class="uiBtn uiBtn--never" type="button">
+          <span class="uiBtnText small">Skip This</span>
+        </button>
+      </div>
+
+      <div class="menuHint pixelHint">Press Enter to start<br> Press Esc to permanently skip this page</div>
+    </div>
+  </div>
+</div>
+
+  <header class="nav">
+    <div class="container navInner row between">
+      <a class="brand" href="#top" aria-label="Home">
+        <span class="dot" aria-hidden="true"></span>
+        <span>Jirui Zhang</span>
+      </a>
+
+      <nav class="navLinks" aria-label="Primary">
+        <a href="#projects">Projects</a>
+        <a href="#about">About</a>
+        <a href="#resume">Resume</a>
+        <a href="#contact">Contact</a>
+        <button id="themeToggle" class="iconBtn" type="button" aria-label="Toggle theme">
+          <span id="themeIcon" aria-hidden="true">🌙</span>
+          <span id="themeLabel">Dark</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="container">
+        <div class="kicker reveal">
+          <span>Games / VR / Interactive Systems</span>
+          <code>Unity • Unreal • C++ • Java</code>
+        </div>
+
+        <h1 class="reveal">
+          From Prototypes to <span class="grad">Playable </span> Games
+        </h1>
+
+        <p class="sub reveal">
+          Focus: interactive gameplay systems, VR experiences, and practical tooling (AI-assisted pipelines, performance engineering, iteration loops).
+          This site is designed for quick review: each project includes a demo, personal-role breakdown, and key decisions.
+        </p>
+
+        <div class="cta reveal">
+          <a class="btn primary" href="#projects">View featured work</a>
+          <a class="btn" href="assets/Resume.pdf" target="_blank" rel="noopener">Open resume</a>
+          <a class="btn" href="#about">About me</a>
+          <a class="btn" href="#contact">Email me</a>
+        </div>
+
+        <div class="badgeRow reveal">
+          <span class="badge"><strong>Available:</strong> 2026 Fall</span>
+          <span class="badge"><strong>Interests:</strong> game development / interactive gameplay / NPC Design</span>
+          <span class="badge"><strong>Tooling:</strong> profiling; iteration; Generative AI</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="projects" class="section">
+      <div class="container">
+        <h2 class="reveal">Selected Projects</h2>
+
+        <div id="filters" class="filters reveal" aria-label="Project filters"></div>
+
+        <div id="projectGrid" class="grid" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section id="about" class="section">
+  <div class="container twoCol">
+    <div class="panel reveal">
+      <h2>About Me</h2>
+      <p>
+        I’m a Computer Science with AI student at the University of Nottingham, focused on building gameplay systems where
+        engineering quality directly shapes player experience: responsive control loops, readable AI, and performance that holds
+        up on real devices (especially VR).
+      </p>
+      <p style="margin-top:12px">
+        Recent work includes UE5 VR mini-games for rehabilitation (game hub + multiple mini-games, enemy state-based AI,
+        and procedural maze generation), Unreal performance optimisation (profiling + batching/resource tuning), and an ongoing
+        research project building a text-to-NPC pipeline in Unity with a locally deployed LLM and schema-validated JSON output.
+      </p>
+    </div>
+
+    <div class="panel reveal">
+      <h2>Quick Facts</h2>
+      <div class="kv" style="margin-top:10px">
+        <div class="kvItem">
+          <div class="k">Primary stack</div>
+          <div class="v">Unreal Engine 5 • Unity • C++</div>
+          <div class="small">Blueprint/C# • gameplay systems • tooling</div>
+        </div>
+        <div class="kvItem">
+          <div class="k">Strength</div>
+          <div class="v">Systems + iteration</div>
+          <div class="small">profile → refactor → validate</div>
+        </div>
+        <div class="kvItem">
+          <div class="k">What I ship</div>
+          <div class="v">Playable prototypes</div>
+          <div class="small">AI logic • procedural content • UI loops</div>
+        </div>
+        <div class="kvItem">
+          <div class="k">Current focus</div>
+          <div class="v">Generative NPC pipeline</div>
+          <div class="small">LLM + validation + runtime injection</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+    <section id="resume" class="section">
+      <div class="container">
+        <div class="panel reveal">
+          <h2>Resume</h2>
+          <div class="cta" style="margin-top:12px">
+            <a class="btn primary" href="assets/Resume.pdf" target="_blank" rel="noopener">Open Resume.pdf</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="section">
+      <div class="container twoCol">
+        <div class="panel reveal">
+          <h2>Contact</h2>
+          <p>
+            Email is fastest. If you include a link to a project, I’ll reply with the relevant build/video and implementation notes.
+          </p>
+          <div class="cta" style="margin-top:12px">
+            <a class="btn primary" href="mailto:ssyjz21@nottingham.ac.uk">ssyjz21@nottingham.ac.uk</a>
+            <a class="btn" href="https://projects.cs.nott.ac.uk/ssyjz21" target="_blank" rel="noopener">GitLab</a>
+            <a class="btn" href="https://www.linkedin.com/in/jirui-zhang-a922ab3a2" target="_blank" rel="noopener">LinkedIn</a>
+          </div>
+        </div>
+
+        <div class="panel reveal">
+          <h2>Reviewer mode</h2>
+          <p>
+            Each project page follows the same structure:
+            <span class="grad" style="font-weight:650">TL;DR → demo → your role → tech breakdown → iteration → outcomes</span>.
+            That consistency helps reviewers compare quickly.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="container row between wrap">
+        <div>© <span id="year"></span> Jirui Zhang • Built with plain HTML/CSS/JS.</div>
+        <div class="row wrap" style="gap:12px">
+          <a href="#top">Back to top</a>
+          <a href="projects/vr-rehab.html">Sample case study</a>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <script src="assets/app.js" defer></script>
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
